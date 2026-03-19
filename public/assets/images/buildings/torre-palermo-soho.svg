@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#87CEEB"/>
+      <stop offset="100%" stop-color="#B0E0E6"/>
+    </linearGradient>
+    <linearGradient id="building" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6B7280"/>
+      <stop offset="50%" stop-color="#9CA3AF"/>
+      <stop offset="100%" stop-color="#6B7280"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#93C5FD"/>
+      <stop offset="100%" stop-color="#60A5FA"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="1000" fill="url(#sky)"/>
+
+  <!-- Ground -->
+  <rect x="0" y="900" width="800" height="100" fill="#86EFAC" rx="0"/>
+  <rect x="0" y="890" width="800" height="20" fill="#4ADE80" rx="5"/>
+
+  <!-- Building shadow -->
+  <rect x="210" y="150" width="400" height="760" fill="#374151" opacity="0.15" rx="4" transform="skewX(-3)"/>
+
+  <!-- Main building body -->
+  <rect x="200" y="140" width="400" height="760" fill="url(#building)" rx="4"/>
+
+  <!-- Building top accent -->
+  <rect x="200" y="140" width="400" height="15" fill="#4B5563" rx="4"/>
+
+  <!-- Rooftop elements -->
+  <rect x="350" y="100" width="100" height="45" fill="#6B7280" rx="3"/>
+  <rect x="370" y="80" width="15" height="25" fill="#9CA3AF" rx="2"/>
+  <rect x="415" y="85" width="10" height="20" fill="#9CA3AF" rx="2"/>
+
+  <!-- Floor labels and windows - Piso 10 -->
+  <text x="185" y="195" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">P10</text>
+  <rect x="230" y="170" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="300" y="170" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="370" y="170" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="445" y="170" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="515" y="170" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+
+  <!-- Piso 9 -->
+  <text x="185" y="265" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">P9</text>
+  <rect x="230" y="240" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="300" y="240" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="370" y="240" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="445" y="240" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="515" y="240" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+
+  <!-- Piso 8 -->
+  <text x="185" y="335" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">P8</text>
+  <rect x="230" y="310" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="300" y="310" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="370" y="310" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="445" y="310" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="515" y="310" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+
+  <!-- Piso 7 -->
+  <text x="185" y="405" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">P7</text>
+  <rect x="230" y="380" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="300" y="380" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="370" y="380" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="445" y="380" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="515" y="380" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+
+  <!-- Piso 6 -->
+  <text x="185" y="475" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">P6</text>
+  <rect x="230" y="450" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="300" y="450" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="370" y="450" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="445" y="450" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="515" y="450" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+
+  <!-- Piso 5 -->
+  <text x="185" y="545" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">P5</text>
+  <rect x="230" y="520" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="300" y="520" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="370" y="520" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="445" y="520" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="515" y="520" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+
+  <!-- Piso 4 -->
+  <text x="185" y="615" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">P4</text>
+  <rect x="230" y="590" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="300" y="590" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="370" y="590" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="445" y="590" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="515" y="590" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+
+  <!-- Piso 3 -->
+  <text x="185" y="685" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">P3</text>
+  <rect x="230" y="660" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="300" y="660" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="370" y="660" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="445" y="660" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="515" y="660" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+
+  <!-- Piso 2 -->
+  <text x="185" y="755" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">P2</text>
+  <rect x="230" y="730" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="300" y="730" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="370" y="730" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="445" y="730" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+  <rect x="515" y="730" width="55" height="40" fill="url(#glass)" rx="2" opacity="0.8"/>
+
+  <!-- Piso 1 (PB) -->
+  <text x="185" y="835" fill="#4B5563" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">PB</text>
+  <rect x="230" y="805" width="55" height="50" fill="#D1D5DB" rx="2"/>
+  <rect x="300" y="805" width="55" height="50" fill="#D1D5DB" rx="2"/>
+  <!-- Entrance -->
+  <rect x="365" y="800" width="70" height="95" fill="#4B5563" rx="4"/>
+  <rect x="370" y="805" width="60" height="85" fill="#374151" rx="3"/>
+  <rect x="395" y="830" width="10" height="55" fill="#D1D5DB" rx="1"/>
+  <rect x="445" y="805" width="55" height="50" fill="#D1D5DB" rx="2"/>
+  <rect x="515" y="805" width="55" height="50" fill="#D1D5DB" rx="2"/>
+
+  <!-- Building name -->
+  <rect x="280" y="860" width="240" height="30" fill="#374151" rx="4"/>
+  <text x="400" y="881" fill="white" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">TORRE PALERMO SOHO</text>
+
+  <!-- Trees -->
+  <circle cx="130" cy="860" r="35" fill="#22C55E" opacity="0.8"/>
+  <circle cx="120" cy="840" r="30" fill="#16A34A" opacity="0.8"/>
+  <rect x="125" y="870" width="10" height="30" fill="#92400E" rx="2"/>
+
+  <circle cx="670" cy="850" r="40" fill="#22C55E" opacity="0.8"/>
+  <circle cx="680" cy="830" r="32" fill="#16A34A" opacity="0.8"/>
+  <rect x="672" y="870" width="10" height="30" fill="#92400E" rx="2"/>
+</svg>

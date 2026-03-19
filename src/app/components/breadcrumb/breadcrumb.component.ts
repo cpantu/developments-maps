@@ -79,6 +79,7 @@ export class BreadcrumbComponent {
       city: '🏙️',
       neighborhood: '🏘️',
       building: '🏢',
+      floor: '📐',
       property: '🏠',
     };
     return icons[type] ?? '📍';

@@ -1,4 +1,4 @@
-export type NodeType = 'city' | 'neighborhood' | 'building' | 'property';
+export type NodeType = 'city' | 'neighborhood' | 'building' | 'floor' | 'property';
 
 export interface MapNode {
   id: string;
