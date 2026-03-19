@@ -4,10 +4,12 @@ import {
   OnDestroy,
   ElementRef,
   ViewChild,
+  NgZone,
   input,
   output,
   effect,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import * as L from 'leaflet';
 import { MapNode, NodeType } from '../../models/map-node.model';
@@ -18,20 +20,13 @@ import { MapNode, NodeType } from '../../models/map-node.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div #mapContainer class="map-container" [class.hidden]="isImageMode"></div>
-    <div
-      #imageContainer
-      class="image-container"
-      [class.hidden]="!isImageMode"
-    >
+    <div class="image-container" [class.hidden]="!isImageMode">
       <div class="image-wrapper" #imageWrapper>
         <img
           #buildingImage
           class="overlay-image"
-          [src]="currentImageUrl"
-          (load)="onImageLoaded()"
           alt=""
         />
-        <!-- Clickable zones on the image -->
         <div class="image-zones" #imageZones></div>
       </div>
     </div>
@@ -66,13 +61,12 @@ import { MapNode, NodeType } from '../../models/map-node.model';
       .image-wrapper {
         position: relative;
         display: inline-block;
-        max-width: 100%;
-        max-height: 100%;
+        height: 100%;
       }
       .overlay-image {
         display: block;
-        max-width: 100%;
-        max-height: 100%;
+        height: 100%;
+        width: auto;
         object-fit: contain;
         border-radius: 8px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -80,24 +74,25 @@ import { MapNode, NodeType } from '../../models/map-node.model';
       .image-zones {
         position: absolute;
         inset: 0;
-        pointer-events: none;
       }
       .image-zone-btn {
         position: absolute;
-        pointer-events: all;
         cursor: pointer;
-        border: 3px solid transparent;
+        border: 3px solid rgba(99, 102, 241, 0.3);
         border-radius: 8px;
-        background: transparent;
+        background: rgba(99, 102, 241, 0.05);
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 0;
+        outline: none;
       }
       .image-zone-btn:hover {
-        background: rgba(59, 130, 246, 0.15);
-        border-color: rgba(59, 130, 246, 0.6);
+        background: rgba(59, 130, 246, 0.2);
+        border-color: rgba(59, 130, 246, 0.8);
         transform: scale(1.02);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
       }
       .image-zone-btn .zone-label-tag {
         background: white;
@@ -129,9 +124,11 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer') mapContainer!: ElementRef;
   @ViewChild('imageZones') imageZones!: ElementRef;
   @ViewChild('buildingImage') buildingImage!: ElementRef;
+  @ViewChild('imageWrapper') imageWrapper!: ElementRef;
 
   currentNode = input.required<MapNode>();
   zoneClicked = output<MapNode>();
+  zoomOutBack = output<void>();
   transitionStart = output<void>();
   transitionEnd = output<void>();
 
@@ -143,6 +140,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
   private layerGroup = L.layerGroup();
   private isAnimating = false;
   private mapInitialized = false;
+  private userZoomEnabled = false;
 
   private readonly typeColors: Record<NodeType, string> = {
     city: '#3b82f6',
@@ -158,22 +156,29 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     sold: '#ef4444',
   };
 
-  constructor() {
+  constructor(
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+  ) {
     effect(() => {
       const node = this.currentNode();
       if (!node) return;
 
-      // Determine if we should use image mode
       const useImage = !!node.imageOverlay;
 
       if (useImage) {
         this.isImageMode = true;
-        this.currentImageUrl = node.imageOverlay!.url;
-        // Children will be rendered as clickable zones on the image once loaded
+        this.loadImageAndRenderZones(node);
+        this.cdr.markForCheck();
       } else {
         this.isImageMode = false;
+        this.cdr.markForCheck();
         if (this.mapInitialized) {
-          this.flyToAndRender(node);
+          // Small delay so the map container becomes visible before flyTo
+          setTimeout(() => {
+            this.map.invalidateSize();
+            this.flyToAndRender(node);
+          }, 50);
         }
       }
     });
@@ -187,8 +192,20 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     this.map?.remove();
   }
 
-  onImageLoaded(): void {
-    this.renderImageZones();
+  private loadImageAndRenderZones(node: MapNode): void {
+    const img = this.buildingImage?.nativeElement as HTMLImageElement;
+    if (!img) return;
+
+    const url = node.imageOverlay!.url;
+
+    // Force re-render even if same URL by clearing first
+    img.src = '';
+    setTimeout(() => {
+      img.onload = () => {
+        this.renderImageZones(node);
+      };
+      img.src = url;
+    }, 10);
   }
 
   private initMap(): void {
@@ -213,6 +230,27 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     this.layerGroup.addTo(this.map);
     this.mapInitialized = true;
 
+    // Listen for user zoom-out to navigate back
+    this.map.on('zoomend', () => {
+      if (this.isAnimating || !this.userZoomEnabled) return;
+      const currentZoom = this.map.getZoom();
+      const nodeZoom = this.currentNode().zoom;
+      // If user zoomed out significantly below the current node's zoom level
+      if (currentZoom < nodeZoom - 1.5) {
+        this.ngZone.run(() => {
+          this.zoomOutBack.emit();
+        });
+      }
+    });
+
+    // Track user-initiated zooms vs programmatic
+    this.map.on('movestart', () => {
+      // flyTo sets isAnimating=true, so if not animating it's user-initiated
+      if (!this.isAnimating) {
+        this.userZoomEnabled = true;
+      }
+    });
+
     if (!node.imageOverlay) {
       this.renderChildren(node);
     }
@@ -221,10 +259,8 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
   private flyToAndRender(node: MapNode): void {
     if (this.isAnimating) return;
     this.isAnimating = true;
+    this.userZoomEnabled = false;
     this.transitionStart.emit();
-
-    // Invalidate map size in case it was hidden
-    setTimeout(() => this.map.invalidateSize(), 50);
 
     this.map.flyTo(node.center, node.zoom, {
       duration: 1.5,
@@ -235,6 +271,10 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
       this.layerGroup.clearLayers();
       this.renderChildren(node);
       this.isAnimating = false;
+      // Re-enable user zoom detection after a brief delay
+      setTimeout(() => {
+        this.userZoomEnabled = true;
+      }, 300);
       this.transitionEnd.emit();
     });
   }
@@ -245,7 +285,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     for (const child of node.children) {
       if (child.type === 'property') {
         this.addPropertyMarker(child);
-      } else if (child.polygon) {
+      } else if (child.polygon && child.polygon.length > 2) {
         this.addPolygon(child);
       } else {
         this.addMarker(child);
@@ -253,23 +293,16 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private renderImageZones(): void {
-    const node = this.currentNode();
+  private renderImageZones(node: MapNode): void {
     if (!node.children?.length || !this.imageZones?.nativeElement) return;
 
     const container = this.imageZones.nativeElement as HTMLElement;
     container.innerHTML = '';
 
-    const img = this.buildingImage.nativeElement as HTMLImageElement;
-    const imgRect = img.getBoundingClientRect();
-    const naturalW = img.naturalWidth;
-    const naturalH = img.naturalHeight;
-
     for (const child of node.children) {
-      if (!child.polygon?.length) continue;
+      if (!child.polygon?.length || child.polygon.length < 2) continue;
 
-      // polygon coords are in image-pixel percentages [y%, x%]
-      // We interpret polygon as [[topPct, leftPct], [bottomPct, rightPct]]
+      // polygon coords: [[topPct, leftPct], [bottomPct, rightPct]]
       const [topLeft, bottomRight] = child.polygon;
       const top = topLeft[0];
       const left = topLeft[1];
@@ -292,10 +325,12 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
 
       btn.innerHTML = `<span class="zone-label-tag ${statusClass}">${child.name}</span>`;
 
-      btn.addEventListener('click', () => {
-        if (!this.isAnimating) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.ngZone.run(() => {
           this.zoneClicked.emit(child);
-        }
+        });
       });
 
       container.appendChild(btn);
@@ -307,50 +342,55 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
 
     const polygon = L.polygon(node.polygon!, {
       color,
-      weight: 2,
+      weight: 3,
       fillColor: color,
-      fillOpacity: 0.15,
+      fillOpacity: 0.2,
       className: 'zone-polygon',
     });
 
-    polygon.bindTooltip(this.createTooltipContent(node), {
-      sticky: true,
-      className: 'zone-tooltip',
-      direction: 'top',
-      offset: [0, -10],
-    });
-
+    // Click on polygon itself
     polygon.on('click', () => {
       if (!this.isAnimating) {
-        this.zoneClicked.emit(node);
+        this.ngZone.run(() => {
+          this.zoneClicked.emit(node);
+        });
       }
     });
 
     polygon.on('mouseover', () => {
-      polygon.setStyle({ fillOpacity: 0.35, weight: 3 });
+      polygon.setStyle({ fillOpacity: 0.4, weight: 4 });
     });
 
     polygon.on('mouseout', () => {
-      polygon.setStyle({ fillOpacity: 0.15, weight: 2 });
+      polygon.setStyle({ fillOpacity: 0.2, weight: 3 });
     });
 
     this.layerGroup.addLayer(polygon);
 
-    // Add label at center
+    // Add clickable label at center
     const center = polygon.getBounds().getCenter();
     const childLabel = this.getChildLabel(node);
     const label = L.marker(center, {
       icon: L.divIcon({
         className: 'zone-label',
-        html: `<div class="zone-label-inner" style="border-color: ${color}">
+        html: `<div class="zone-label-inner clickable-label" style="border-color: ${color}">
           <strong>${node.name}</strong>
           ${childLabel ? `<span>${childLabel}</span>` : ''}
         </div>`,
         iconSize: [160, 50],
         iconAnchor: [80, 25],
       }),
-      interactive: false,
+      interactive: true,
     });
+
+    label.on('click', () => {
+      if (!this.isAnimating) {
+        this.ngZone.run(() => {
+          this.zoneClicked.emit(node);
+        });
+      }
+    });
+
     this.layerGroup.addLayer(label);
   }
 
@@ -359,7 +399,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     const color = this.statusColors[status];
 
     const marker = L.circleMarker(node.center, {
-      radius: 12,
+      radius: 14,
       color: '#fff',
       weight: 3,
       fillColor: color,
@@ -374,24 +414,36 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
         }).format(node.details.price)
       : '';
 
-    marker.bindTooltip(
-      `<div class="property-tooltip">
+    // Use popup instead of tooltip for better click handling
+    marker.bindPopup(
+      `<div class="property-popup">
         <strong>${node.name}</strong>
-        <div>${priceFormatted}</div>
+        <div class="popup-price">${priceFormatted}</div>
         <div>${node.details?.area}m² · ${node.details?.bedrooms} hab · ${node.details?.bathrooms} baños</div>
         <div class="status-badge status-${status}">${status === 'available' ? 'Disponible' : status === 'reserved' ? 'Reservado' : 'Vendido'}</div>
+        <button class="popup-detail-btn" data-node-id="${node.id}">Ver detalle</button>
       </div>`,
       {
-        className: 'property-tooltip-wrapper',
-        direction: 'top',
-        offset: [0, -15],
+        className: 'property-popup-wrapper',
+        closeButton: true,
+        maxWidth: 250,
       }
     );
 
-    marker.on('click', () => {
-      if (!this.isAnimating) {
-        this.zoneClicked.emit(node);
-      }
+    marker.on('popupopen', () => {
+      setTimeout(() => {
+        const btn = document.querySelector(
+          `[data-node-id="${node.id}"]`
+        ) as HTMLElement;
+        if (btn) {
+          btn.addEventListener('click', () => {
+            this.ngZone.run(() => {
+              this.zoneClicked.emit(node);
+            });
+            marker.closePopup();
+          });
+        }
+      }, 50);
     });
 
     this.layerGroup.addLayer(marker);
@@ -400,7 +452,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
   private addMarker(node: MapNode): void {
     const color = this.typeColors[node.type];
     const marker = L.circleMarker(node.center, {
-      radius: 10,
+      radius: 12,
       color,
       weight: 2,
       fillColor: color,
@@ -414,7 +466,9 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
 
     marker.on('click', () => {
       if (!this.isAnimating) {
-        this.zoneClicked.emit(node);
+        this.ngZone.run(() => {
+          this.zoneClicked.emit(node);
+        });
       }
     });
 

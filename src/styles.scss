@@ -48,37 +48,50 @@ body {
   }
 }
 
-.property-tooltip-wrapper {
-  background: white !important;
-  border: none !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18) !important;
-  padding: 0 !important;
-  font-family: inherit !important;
-
-  &::before {
-    border-top-color: white !important;
+// Property popup (replaced tooltip for better click handling)
+.property-popup-wrapper {
+  .leaflet-popup-content-wrapper {
+    background: white !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18) !important;
+    padding: 0 !important;
+    font-family: inherit !important;
+  }
+  .leaflet-popup-content {
+    margin: 0 !important;
+    min-width: 200px;
+  }
+  .leaflet-popup-tip {
+    background: white !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
   }
 }
 
-.property-tooltip {
-  padding: 12px 16px;
+.property-popup {
+  padding: 14px 16px;
 
   strong {
     display: block;
-    font-size: 14px;
+    font-size: 15px;
     color: #1f2937;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
   div {
     font-size: 12px;
     color: #6b7280;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
+  }
+  .popup-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 6px;
   }
   .status-badge {
     display: inline-block;
     margin-top: 6px;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 12px;
     font-size: 11px;
     font-weight: 600;
@@ -94,6 +107,25 @@ body {
   .status-sold {
     background: #fee2e2;
     color: #991b1b;
+  }
+  .popup-detail-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 0;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+
+    &:hover {
+      background: #2563eb;
+    }
   }
 }
 
@@ -120,6 +152,17 @@ body {
   span {
     font-size: 11px;
     color: #6b7280;
+  }
+
+  &.clickable-label {
+    pointer-events: all;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    }
   }
 }
 

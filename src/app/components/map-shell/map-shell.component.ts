@@ -24,6 +24,7 @@ import { MapNode } from '../../models/map-node.model';
           <app-map-view
             [currentNode]="currentNode"
             (zoneClicked)="onZoneClicked($event)"
+            (zoomOutBack)="nav.goBack()"
             (transitionStart)="transitionState = 'traveling'"
             (transitionEnd)="transitionState = 'idle'"
           />
