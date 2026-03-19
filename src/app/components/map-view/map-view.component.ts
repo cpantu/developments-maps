@@ -75,48 +75,68 @@ import { MapNode, NodeType } from '../../models/map-node.model';
         position: absolute;
         inset: 0;
       }
-      .image-zone-btn {
+      /* Transparent clickable zone - feels like clicking the image itself */
+      .image-zone {
         position: absolute;
         cursor: pointer;
-        border: 3px solid rgba(99, 102, 241, 0.3);
-        border-radius: 8px;
-        background: rgba(99, 102, 241, 0.05);
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        border: none;
+        border-radius: 0;
+        background: transparent;
         padding: 0;
         outline: none;
+        transition: background 0.25s ease, box-shadow 0.25s ease;
       }
-      .image-zone-btn:hover {
-        background: rgba(59, 130, 246, 0.2);
-        border-color: rgba(59, 130, 246, 0.8);
-        transform: scale(1.02);
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+      .image-zone:hover {
+        background: rgba(59, 130, 246, 0.18);
+        box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.5);
       }
-      .image-zone-btn .zone-label-tag {
+      .image-zone:active {
+        background: rgba(59, 130, 246, 0.30);
+      }
+      /* Tooltip that appears on hover */
+      .image-zone-tip {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%) translateY(6px);
         background: white;
         padding: 6px 14px;
-        border-radius: 20px;
+        border-radius: 8px;
         font-size: 13px;
         font-weight: 600;
         color: #1f2937;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
         white-space: nowrap;
         pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s ease, transform 0.2s ease;
       }
-      .image-zone-btn .zone-label-tag.available {
-        border-left: 3px solid #10b981;
+      .image-zone-tip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: white;
       }
-      .image-zone-btn .zone-label-tag.reserved {
-        border-left: 3px solid #f59e0b;
+      .image-zone:hover .image-zone-tip {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
       }
-      .image-zone-btn .zone-label-tag.sold {
-        border-left: 3px solid #ef4444;
+      /* Status dot inside tooltip */
+      .tip-status {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 6px;
+        vertical-align: middle;
       }
-      .image-zone-btn .zone-label-tag.floor {
-        border-left: 3px solid #8b5cf6;
-      }
+      .tip-status.available { background: #10b981; }
+      .tip-status.reserved { background: #f59e0b; }
+      .tip-status.sold { background: #ef4444; }
+      .tip-status.floor { background: #8b5cf6; }
     `,
   ],
 })
@@ -309,13 +329,15 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
       const height = bottomRight[0] - topLeft[0];
       const width = bottomRight[1] - topLeft[1];
 
-      const btn = document.createElement('button');
-      btn.className = 'image-zone-btn';
-      btn.style.top = `${top}%`;
-      btn.style.left = `${left}%`;
-      btn.style.width = `${width}%`;
-      btn.style.height = `${height}%`;
+      // Transparent zone - the image shows through, just highlight on hover
+      const zone = document.createElement('button');
+      zone.className = 'image-zone';
+      zone.style.top = `${top}%`;
+      zone.style.left = `${left}%`;
+      zone.style.width = `${width}%`;
+      zone.style.height = `${height}%`;
 
+      // Status indicator for the tooltip
       const statusClass =
         child.type === 'property'
           ? child.details?.status ?? 'available'
@@ -323,9 +345,23 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
             ? 'floor'
             : 'available';
 
-      btn.innerHTML = `<span class="zone-label-tag ${statusClass}">${child.name}</span>`;
+      // Tooltip appears on hover with name and optional info
+      let tipContent = `<span class="tip-status ${statusClass}"></span>${child.name}`;
+      if (child.type === 'property' && child.details) {
+        const price = new Intl.NumberFormat('es-AR', {
+          style: 'currency',
+          currency: child.details.currency,
+          maximumFractionDigits: 0,
+        }).format(child.details.price);
+        tipContent += ` · ${price}`;
+      }
+      if (child.type === 'floor' && child.children) {
+        tipContent += ` · ${child.children.length} deptos`;
+      }
 
-      btn.addEventListener('click', (e) => {
+      zone.innerHTML = `<span class="image-zone-tip">${tipContent}</span>`;
+
+      zone.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         this.ngZone.run(() => {
@@ -333,7 +369,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
         });
       });
 
-      container.appendChild(btn);
+      container.appendChild(zone);
     }
   }
 
