@@ -1,0 +1,314 @@
+{
+  "id": "bogota",
+  "name": "Bogotá",
+  "type": "city",
+  "description": "Capital de Colombia - Explora propiedades disponibles",
+  "center": [4.6486, -74.0629],
+  "zoom": 12,
+  "children": [
+    {
+      "id": "chapinero",
+      "name": "Chapinero",
+      "type": "neighborhood",
+      "description": "Zona vibrante con excelente vida nocturna y gastronómica",
+      "center": [4.6436, -74.0630],
+      "zoom": 15,
+      "polygon": [
+        [4.6536, -74.0730],
+        [4.6536, -74.0530],
+        [4.6336, -74.0530],
+        [4.6336, -74.0730]
+      ],
+      "children": [
+        {
+          "id": "torre-platinum",
+          "name": "Torre Platinum",
+          "type": "building",
+          "description": "Edificio moderno de 20 pisos con amenidades premium",
+          "center": [4.6466, -74.0610],
+          "zoom": 18,
+          "polygon": [
+            [4.6476, -74.0620],
+            [4.6476, -74.0600],
+            [4.6456, -74.0600],
+            [4.6456, -74.0620]
+          ],
+          "children": [
+            {
+              "id": "platinum-101",
+              "name": "Apartamento 101",
+              "type": "property",
+              "center": [4.6470, -74.0612],
+              "zoom": 20,
+              "details": {
+                "price": 350000000,
+                "currency": "COP",
+                "area": 85,
+                "bedrooms": 3,
+                "bathrooms": 2,
+                "floor": 1,
+                "status": "available"
+              }
+            },
+            {
+              "id": "platinum-202",
+              "name": "Apartamento 202",
+              "type": "property",
+              "center": [4.6468, -74.0608],
+              "zoom": 20,
+              "details": {
+                "price": 420000000,
+                "currency": "COP",
+                "area": 110,
+                "bedrooms": 3,
+                "bathrooms": 2,
+                "floor": 2,
+                "status": "available"
+              }
+            },
+            {
+              "id": "platinum-ph",
+              "name": "Penthouse 2001",
+              "type": "property",
+              "center": [4.6464, -74.0606],
+              "zoom": 20,
+              "details": {
+                "price": 980000000,
+                "currency": "COP",
+                "area": 220,
+                "bedrooms": 4,
+                "bathrooms": 3,
+                "floor": 20,
+                "status": "reserved"
+              }
+            }
+          ]
+        },
+        {
+          "id": "edificio-central",
+          "name": "Edificio Central Park",
+          "type": "building",
+          "description": "Ubicación privilegiada frente al parque",
+          "center": [4.6416, -74.0650],
+          "zoom": 18,
+          "polygon": [
+            [4.6426, -74.0660],
+            [4.6426, -74.0640],
+            [4.6406, -74.0640],
+            [4.6406, -74.0660]
+          ],
+          "children": [
+            {
+              "id": "central-301",
+              "name": "Apartamento 301",
+              "type": "property",
+              "center": [4.6420, -74.0652],
+              "zoom": 20,
+              "details": {
+                "price": 280000000,
+                "currency": "COP",
+                "area": 72,
+                "bedrooms": 2,
+                "bathrooms": 1,
+                "floor": 3,
+                "status": "available"
+              }
+            },
+            {
+              "id": "central-502",
+              "name": "Apartamento 502",
+              "type": "property",
+              "center": [4.6414, -74.0648],
+              "zoom": 20,
+              "details": {
+                "price": 310000000,
+                "currency": "COP",
+                "area": 78,
+                "bedrooms": 2,
+                "bathrooms": 2,
+                "floor": 5,
+                "status": "sold"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "usaquen",
+      "name": "Usaquén",
+      "type": "neighborhood",
+      "description": "Zona exclusiva con arquitectura colonial y restaurantes de alta gama",
+      "center": [4.6966, -74.0324],
+      "zoom": 15,
+      "polygon": [
+        [4.7066, -74.0424],
+        [4.7066, -74.0224],
+        [4.6866, -74.0224],
+        [4.6866, -74.0424]
+      ],
+      "children": [
+        {
+          "id": "parque-living",
+          "name": "Parque Living",
+          "type": "building",
+          "description": "Conjunto residencial con amplias zonas verdes",
+          "center": [4.6966, -74.0324],
+          "zoom": 18,
+          "polygon": [
+            [4.6976, -74.0334],
+            [4.6976, -74.0314],
+            [4.6956, -74.0314],
+            [4.6956, -74.0334]
+          ],
+          "children": [
+            {
+              "id": "living-101",
+              "name": "Casa 101",
+              "type": "property",
+              "center": [4.6970, -74.0328],
+              "zoom": 20,
+              "details": {
+                "price": 520000000,
+                "currency": "COP",
+                "area": 150,
+                "bedrooms": 4,
+                "bathrooms": 3,
+                "floor": 1,
+                "status": "available"
+              }
+            },
+            {
+              "id": "living-103",
+              "name": "Casa 103",
+              "type": "property",
+              "center": [4.6962, -74.0320],
+              "zoom": 20,
+              "details": {
+                "price": 480000000,
+                "currency": "COP",
+                "area": 135,
+                "bedrooms": 3,
+                "bathrooms": 2,
+                "floor": 1,
+                "status": "available"
+              }
+            }
+          ]
+        },
+        {
+          "id": "mirador-tower",
+          "name": "Torre Mirador",
+          "type": "building",
+          "description": "Torre de lujo con vista panorámica a los cerros",
+          "center": [4.6940, -74.0350],
+          "zoom": 18,
+          "polygon": [
+            [4.6950, -74.0360],
+            [4.6950, -74.0340],
+            [4.6930, -74.0340],
+            [4.6930, -74.0360]
+          ],
+          "children": [
+            {
+              "id": "mirador-801",
+              "name": "Apartamento 801",
+              "type": "property",
+              "center": [4.6944, -74.0354],
+              "zoom": 20,
+              "details": {
+                "price": 680000000,
+                "currency": "COP",
+                "area": 120,
+                "bedrooms": 3,
+                "bathrooms": 2,
+                "floor": 8,
+                "status": "available"
+              }
+            },
+            {
+              "id": "mirador-1201",
+              "name": "Apartamento 1201",
+              "type": "property",
+              "center": [4.6938, -74.0348],
+              "zoom": 20,
+              "details": {
+                "price": 750000000,
+                "currency": "COP",
+                "area": 140,
+                "bedrooms": 3,
+                "bathrooms": 3,
+                "floor": 12,
+                "status": "reserved"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "santa-barbara",
+      "name": "Santa Bárbara",
+      "type": "neighborhood",
+      "description": "Sector residencial de alto nivel con excelente conectividad",
+      "center": [4.6700, -74.0520],
+      "zoom": 15,
+      "polygon": [
+        [4.6800, -74.0620],
+        [4.6800, -74.0420],
+        [4.6600, -74.0420],
+        [4.6600, -74.0620]
+      ],
+      "children": [
+        {
+          "id": "green-towers",
+          "name": "Green Towers",
+          "type": "building",
+          "description": "Proyecto sostenible con certificación LEED",
+          "center": [4.6720, -74.0510],
+          "zoom": 18,
+          "polygon": [
+            [4.6730, -74.0520],
+            [4.6730, -74.0500],
+            [4.6710, -74.0500],
+            [4.6710, -74.0520]
+          ],
+          "children": [
+            {
+              "id": "green-401",
+              "name": "Apartamento 401",
+              "type": "property",
+              "center": [4.6724, -74.0514],
+              "zoom": 20,
+              "details": {
+                "price": 395000000,
+                "currency": "COP",
+                "area": 95,
+                "bedrooms": 3,
+                "bathrooms": 2,
+                "floor": 4,
+                "status": "available"
+              }
+            },
+            {
+              "id": "green-602",
+              "name": "Apartamento 602",
+              "type": "property",
+              "center": [4.6718, -74.0508],
+              "zoom": 20,
+              "details": {
+                "price": 430000000,
+                "currency": "COP",
+                "area": 100,
+                "bedrooms": 3,
+                "bathrooms": 2,
+                "floor": 6,
+                "status": "available"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
