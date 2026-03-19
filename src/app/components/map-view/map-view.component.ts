@@ -75,68 +75,6 @@ import { MapNode, NodeType } from '../../models/map-node.model';
         position: absolute;
         inset: 0;
       }
-      /* Transparent clickable zone - feels like clicking the image itself */
-      .image-zone {
-        position: absolute;
-        cursor: pointer;
-        border: none;
-        border-radius: 0;
-        background: transparent;
-        padding: 0;
-        outline: none;
-        transition: background 0.25s ease, box-shadow 0.25s ease;
-      }
-      .image-zone:hover {
-        background: rgba(59, 130, 246, 0.18);
-        box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.5);
-      }
-      .image-zone:active {
-        background: rgba(59, 130, 246, 0.30);
-      }
-      /* Tooltip that appears on hover */
-      .image-zone-tip {
-        position: absolute;
-        bottom: calc(100% + 8px);
-        left: 50%;
-        transform: translateX(-50%) translateY(6px);
-        background: white;
-        padding: 6px 14px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        color: #1f2937;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-        white-space: nowrap;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 0.2s ease, transform 0.2s ease;
-      }
-      .image-zone-tip::after {
-        content: '';
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        border: 6px solid transparent;
-        border-top-color: white;
-      }
-      .image-zone:hover .image-zone-tip {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-      /* Status dot inside tooltip */
-      .tip-status {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 6px;
-        vertical-align: middle;
-      }
-      .tip-status.available { background: #10b981; }
-      .tip-status.reserved { background: #f59e0b; }
-      .tip-status.sold { background: #ef4444; }
-      .tip-status.floor { background: #8b5cf6; }
     `,
   ],
 })
@@ -319,6 +257,13 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     const container = this.imageZones.nativeElement as HTMLElement;
     container.innerHTML = '';
 
+    const statusColors: Record<string, string> = {
+      available: '#10b981',
+      reserved: '#f59e0b',
+      sold: '#ef4444',
+      floor: '#8b5cf6',
+    };
+
     for (const child of node.children) {
       if (!child.polygon?.length || child.polygon.length < 2) continue;
 
@@ -329,37 +274,112 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
       const height = bottomRight[0] - topLeft[0];
       const width = bottomRight[1] - topLeft[1];
 
-      // Transparent zone - the image shows through, just highlight on hover
-      const zone = document.createElement('button');
-      zone.className = 'image-zone';
-      zone.style.top = `${top}%`;
-      zone.style.left = `${left}%`;
-      zone.style.width = `${width}%`;
-      zone.style.height = `${height}%`;
-
-      // Status indicator for the tooltip
-      const statusClass =
+      const statusKey =
         child.type === 'property'
           ? child.details?.status ?? 'available'
           : child.type === 'floor'
             ? 'floor'
             : 'available';
+      const dotColor = statusColors[statusKey] ?? statusColors['available'];
 
-      // Tooltip appears on hover with name and optional info
-      let tipContent = `<span class="tip-status ${statusClass}"></span>${child.name}`;
+      // Build tooltip text
+      let tipText = child.name;
       if (child.type === 'property' && child.details) {
         const price = new Intl.NumberFormat('es-AR', {
           style: 'currency',
           currency: child.details.currency,
           maximumFractionDigits: 0,
         }).format(child.details.price);
-        tipContent += ` · ${price}`;
+        tipText += ` · ${price}`;
       }
       if (child.type === 'floor' && child.children) {
-        tipContent += ` · ${child.children.length} deptos`;
+        tipText += ` · ${child.children.length} deptos`;
       }
 
-      zone.innerHTML = `<span class="image-zone-tip">${tipContent}</span>`;
+      // --- Zone (transparent clickable area) ---
+      const zone = document.createElement('button');
+      Object.assign(zone.style, {
+        position: 'absolute',
+        top: `${top}%`,
+        left: `${left}%`,
+        width: `${width}%`,
+        height: `${height}%`,
+        cursor: 'pointer',
+        border: 'none',
+        borderRadius: '0',
+        background: 'transparent',
+        padding: '0',
+        outline: 'none',
+        transition: 'background 0.25s ease, box-shadow 0.25s ease',
+      });
+
+      // --- Tooltip (hidden by default, shown on hover) ---
+      const tip = document.createElement('span');
+      Object.assign(tip.style, {
+        position: 'absolute',
+        bottom: 'calc(100% + 8px)',
+        left: '50%',
+        transform: 'translateX(-50%) translateY(6px)',
+        background: 'white',
+        padding: '6px 14px',
+        borderRadius: '8px',
+        fontSize: '13px',
+        fontWeight: '600',
+        color: '#1f2937',
+        boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+        whiteSpace: 'nowrap',
+        pointerEvents: 'none',
+        opacity: '0',
+        transition: 'opacity 0.2s ease, transform 0.2s ease',
+      });
+
+      // Status dot + text
+      const dot = document.createElement('span');
+      Object.assign(dot.style, {
+        display: 'inline-block',
+        width: '8px',
+        height: '8px',
+        borderRadius: '50%',
+        marginRight: '6px',
+        verticalAlign: 'middle',
+        background: dotColor,
+      });
+      tip.appendChild(dot);
+      tip.appendChild(document.createTextNode(tipText));
+
+      // Tooltip arrow
+      const arrow = document.createElement('span');
+      Object.assign(arrow.style, {
+        position: 'absolute',
+        top: '100%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        border: '6px solid transparent',
+        borderTopColor: 'white',
+      });
+      tip.appendChild(arrow);
+
+      zone.appendChild(tip);
+
+      // --- Hover effects (inline, no CSS needed) ---
+      zone.addEventListener('mouseenter', () => {
+        zone.style.background = 'rgba(59, 130, 246, 0.18)';
+        zone.style.boxShadow = 'inset 0 0 0 2px rgba(59, 130, 246, 0.5)';
+        tip.style.opacity = '1';
+        tip.style.transform = 'translateX(-50%) translateY(0)';
+      });
+      zone.addEventListener('mouseleave', () => {
+        zone.style.background = 'transparent';
+        zone.style.boxShadow = 'none';
+        tip.style.opacity = '0';
+        tip.style.transform = 'translateX(-50%) translateY(6px)';
+      });
+      zone.addEventListener('mousedown', () => {
+        zone.style.background = 'rgba(59, 130, 246, 0.30)';
+      });
+      zone.addEventListener('mouseup', () => {
+        zone.style.background = 'rgba(59, 130, 246, 0.18)';
+      });
 
       zone.addEventListener('click', (e) => {
         e.preventDefault();
