@@ -104,11 +104,4 @@
   <rect x="680" y="468" width="120" height="36" fill="#EC4899" rx="8"/>
   <text x="740" y="492" fill="white" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">DEPTO D</text>
 
-  <!-- Compass -->
-  <g transform="translate(930, 660)">
-    <circle r="25" fill="white" stroke="#9CA3AF" stroke-width="1"/>
-    <text y="-8" fill="#374151" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">N</text>
-    <polygon points="0,-20 -5,-10 5,-10" fill="#EF4444"/>
-    <polygon points="0,20 -5,10 5,10" fill="#9CA3AF"/>
-  </g>
 </svg>
