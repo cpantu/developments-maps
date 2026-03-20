@@ -47,7 +47,7 @@
               "zoom": 19,
               "polygon": [[80, 19], [97, 82]],
               "imageOverlay": {
-                "url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop",
+                "url": "assets/images/floorplans/torre-palermo-soho-tipo.svg",
                 "bounds": [[-34.5888, -58.4296], [-34.5876, -58.4284]]
               },
               "children": [
@@ -130,7 +130,7 @@
               "zoom": 19,
               "polygon": [[63, 19], [79, 82]],
               "imageOverlay": {
-                "url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop",
+                "url": "assets/images/floorplans/torre-palermo-soho-tipo.svg",
                 "bounds": [[-34.5888, -58.4296], [-34.5876, -58.4284]]
               },
               "children": [
@@ -213,7 +213,7 @@
               "zoom": 19,
               "polygon": [[46, 19], [62, 82]],
               "imageOverlay": {
-                "url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&h=600&fit=crop",
+                "url": "assets/images/floorplans/torre-palermo-soho-tipo.svg",
                 "bounds": [[-34.5888, -58.4296], [-34.5876, -58.4284]]
               },
               "children": [
@@ -460,7 +460,7 @@
               "zoom": 19,
               "polygon": [[63, 15], [78, 84]],
               "imageOverlay": {
-                "url": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop",
+                "url": "assets/images/floorplans/casona-pilar-tipo.svg",
                 "bounds": [[-34.4625, -58.9148], [-34.4613, -58.9136]]
               },
               "children": [
@@ -543,7 +543,7 @@
               "zoom": 19,
               "polygon": [[49, 15], [62, 84]],
               "imageOverlay": {
-                "url": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop",
+                "url": "assets/images/floorplans/casona-pilar-tipo.svg",
                 "bounds": [[-34.4625, -58.9148], [-34.4613, -58.9136]]
               },
               "children": [
@@ -626,7 +626,7 @@
               "zoom": 19,
               "polygon": [[35, 15], [48, 84]],
               "imageOverlay": {
-                "url": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop",
+                "url": "assets/images/floorplans/casona-pilar-tipo.svg",
                 "bounds": [[-34.4625, -58.9148], [-34.4613, -58.9136]]
               },
               "children": [
