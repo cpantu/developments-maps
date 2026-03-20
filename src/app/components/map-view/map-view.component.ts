@@ -99,6 +99,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
   private isAnimating = false;
   private mapInitialized = false;
   private userZoomEnabled = false;
+  private autoNavCooldown = false;
 
   private readonly typeColors: Record<NodeType, string> = {
     city: '#3b82f6',
@@ -188,17 +189,22 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     this.layerGroup.addTo(this.map);
     this.mapInitialized = true;
 
-    // Listen for user zoom-out to navigate back
+    // Listen for user zoom changes to auto-navigate
     this.map.on('zoomend', () => {
-      if (this.isAnimating || !this.userZoomEnabled) return;
+      if (this.isAnimating || !this.userZoomEnabled || this.autoNavCooldown) return;
       const currentZoom = this.map.getZoom();
       const nodeZoom = this.currentNode().zoom;
-      // If user zoomed out significantly below the current node's zoom level
+
+      // Zoom-out: navigate back
       if (currentZoom < nodeZoom - 1.5) {
         this.ngZone.run(() => {
           this.zoomOutBack.emit();
         });
+        return;
       }
+
+      // Zoom-in: auto-navigate into a child if it dominates the viewport
+      this.checkAutoNavIntoChild();
     });
 
     // Track user-initiated zooms vs programmatic
@@ -218,6 +224,7 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
     if (this.isAnimating) return;
     this.isAnimating = true;
     this.userZoomEnabled = false;
+    this.autoNavCooldown = false;
     this.transitionStart.emit();
 
     this.map.flyTo(node.center, node.zoom, {
@@ -235,6 +242,115 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
       }, 300);
       this.transitionEnd.emit();
     });
+  }
+
+  /**
+   * Auto-navigate into a child node when the user zooms in enough that
+   * a single child dominates the viewport.
+   *
+   * Criteria (any triggers navigation):
+   * - Only one child is visible in the viewport
+   * - A child's bounding box covers ≥ 55% of the viewport area
+   *
+   * Additional guard: the current zoom must be at or above the child's
+   * target zoom minus 1, so we don't trigger too early.
+   */
+  private checkAutoNavIntoChild(): void {
+    const node = this.currentNode();
+    if (!node.children?.length) return;
+
+    // Skip property-type children (they open a detail panel, not a map level)
+    const navigableChildren = node.children.filter(c => c.type !== 'property');
+    if (!navigableChildren.length) return;
+
+    const mapBounds = this.map.getBounds();
+    const viewportArea = this.boundsArea(mapBounds);
+    if (viewportArea <= 0) return;
+
+    const currentZoom = this.map.getZoom();
+
+    // Compute visible children and their viewport coverage
+    const visibleChildren: { child: MapNode; coverage: number }[] = [];
+
+    for (const child of navigableChildren) {
+      const childBounds = this.getChildBounds(child);
+      if (!childBounds) continue;
+
+      // Check if child is visible in the viewport
+      if (!mapBounds.intersects(childBounds)) continue;
+
+      // Zoom guard: don't auto-nav if we're still far from the child's zoom level
+      if (currentZoom < child.zoom - 1) continue;
+
+      // Compute intersection area as percentage of viewport
+      const intersection = L.latLngBounds(
+        L.latLng(
+          Math.max(mapBounds.getSouth(), childBounds.getSouth()),
+          Math.max(mapBounds.getWest(), childBounds.getWest()),
+        ),
+        L.latLng(
+          Math.min(mapBounds.getNorth(), childBounds.getNorth()),
+          Math.min(mapBounds.getEast(), childBounds.getEast()),
+        ),
+      );
+      const coverage = this.boundsArea(intersection) / viewportArea;
+
+      visibleChildren.push({ child, coverage });
+    }
+
+    if (visibleChildren.length === 0) return;
+
+    // Pick the best candidate
+    let target: MapNode | null = null;
+
+    // Case 1: only one navigable child is visible in the viewport
+    if (visibleChildren.length === 1 && visibleChildren[0].coverage > 0.15) {
+      target = visibleChildren[0].child;
+    }
+
+    // Case 2: a single child covers ≥ 55% of the viewport
+    if (!target) {
+      const dominant = visibleChildren.reduce((a, b) =>
+        a.coverage > b.coverage ? a : b,
+      );
+      if (dominant.coverage >= 0.55) {
+        target = dominant.child;
+      }
+    }
+
+    if (target) {
+      // Prevent rapid re-triggers
+      this.autoNavCooldown = true;
+      this.ngZone.run(() => {
+        this.zoneClicked.emit(target!);
+      });
+      setTimeout(() => {
+        this.autoNavCooldown = false;
+      }, 2000);
+    }
+  }
+
+  private getChildBounds(child: MapNode): L.LatLngBounds | null {
+    if (child.polygon && child.polygon.length >= 3) {
+      return L.latLngBounds(
+        child.polygon.map(([lat, lng]) => L.latLng(lat, lng)),
+      );
+    }
+    // For children without polygon, create a small bounds around center
+    if (child.center) {
+      const offset = 0.002; // ~200m approximate
+      return L.latLngBounds(
+        L.latLng(child.center[0] - offset, child.center[1] - offset),
+        L.latLng(child.center[0] + offset, child.center[1] + offset),
+      );
+    }
+    return null;
+  }
+
+  private boundsArea(bounds: L.LatLngBounds): number {
+    const sw = bounds.getSouthWest();
+    const ne = bounds.getNorthEast();
+    return Math.abs((ne.lat - sw.lat) * (ne.lng - sw.lng));
   }
 
   private renderChildren(node: MapNode): void {
