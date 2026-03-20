@@ -296,7 +296,15 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
         tipText += ` · ${child.children.length} deptos`;
       }
 
-      // --- Zone (transparent clickable area) ---
+      // --- Zone clickable area ---
+      const isFloor = child.type === 'floor';
+      const baseBackground = isFloor
+        ? `${dotColor}22`
+        : 'transparent';
+      const baseBorder = isFloor
+        ? `2px solid ${dotColor}55`
+        : 'none';
+
       const zone = document.createElement('button');
       Object.assign(zone.style, {
         position: 'absolute',
@@ -305,12 +313,12 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
         width: `${width}%`,
         height: `${height}%`,
         cursor: 'pointer',
-        border: 'none',
-        borderRadius: '0',
-        background: 'transparent',
+        border: baseBorder,
+        borderRadius: '6px',
+        background: baseBackground,
         padding: '0',
         outline: 'none',
-        transition: 'background 0.25s ease, box-shadow 0.25s ease',
+        transition: 'background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
       });
 
       // --- Tooltip (hidden by default, shown on hover) ---
@@ -362,23 +370,37 @@ export class MapViewComponent implements AfterViewInit, OnDestroy {
       zone.appendChild(tip);
 
       // --- Hover effects (inline, no CSS needed) ---
+      const hoverBg = isFloor
+        ? `${dotColor}40`
+        : 'rgba(59, 130, 246, 0.18)';
+      const hoverBorder = isFloor
+        ? `2px solid ${dotColor}88`
+        : baseBorder;
+      const activeBg = isFloor
+        ? `${dotColor}55`
+        : 'rgba(59, 130, 246, 0.30)';
+
       zone.addEventListener('mouseenter', () => {
-        zone.style.background = 'rgba(59, 130, 246, 0.18)';
-        zone.style.boxShadow = 'inset 0 0 0 2px rgba(59, 130, 246, 0.5)';
+        zone.style.background = hoverBg;
+        zone.style.border = hoverBorder;
+        zone.style.boxShadow = isFloor
+          ? `0 0 12px ${dotColor}33`
+          : 'inset 0 0 0 2px rgba(59, 130, 246, 0.5)';
         tip.style.opacity = '1';
         tip.style.transform = 'translateX(-50%) translateY(0)';
       });
       zone.addEventListener('mouseleave', () => {
-        zone.style.background = 'transparent';
+        zone.style.background = baseBackground;
+        zone.style.border = baseBorder;
         zone.style.boxShadow = 'none';
         tip.style.opacity = '0';
         tip.style.transform = 'translateX(-50%) translateY(6px)';
       });
       zone.addEventListener('mousedown', () => {
-        zone.style.background = 'rgba(59, 130, 246, 0.30)';
+        zone.style.background = activeBg;
       });
       zone.addEventListener('mouseup', () => {
-        zone.style.background = 'rgba(59, 130, 246, 0.18)';
+        zone.style.background = hoverBg;
       });
 
       zone.addEventListener('click', (e) => {
