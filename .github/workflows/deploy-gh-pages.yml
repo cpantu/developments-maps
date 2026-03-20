@@ -27,7 +27,7 @@ jobs:
       - run: npx ng build --base-href /developments-maps/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/developments-maps
+          path: dist/developments-maps/browser
 
   deploy:
     needs: build
